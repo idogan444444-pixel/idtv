@@ -307,6 +307,9 @@
     }
 
     if (channels.length === 0) {
+      if (/#EXT-X-(STREAM-INF|TARGETDURATION|MEDIA-SEQUENCE)/i.test(text)) {
+        throw new Error('Das ist ein einzelner Stream, keine Senderliste. Füge ihn unter „Sender“ mit „Link hinzufügen“ hinzu.');
+      }
       throw new Error('In der Liste wurden keine abspielbaren Sender gefunden.');
     }
     return channels;

@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https: http: data:; media-src 'self' https: http: blob: data:; connect-src 'self' https: http:; worker-src 'self' blob:; frame-src https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="theme-color" content="#0f0f12">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="I&amp;D TV">
+  <title>I&amp;D TV</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="vendor/hls.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <div class="app">
+    <nav class="tabbar" aria-label="Hauptbereiche">
+      <div class="brand" aria-hidden="true">
+        <img src="icons/icon-192.png" alt="" width="40" height="40">
+        <span>I&amp;D TV</span>
+      </div>
+      <button type="button" class="tab" data-tab="sender" aria-current="page">
+        <span class="tab-icon" data-icon="tv"></span><span class="tab-label">Sender</span>
+      </button>
+      <button type="button" class="tab" data-tab="favorites">
+        <span class="tab-icon" data-icon="heart"></span><span class="tab-label">Favoriten</span>
+      </button>
+      <button type="button" class="tab" data-tab="youtube">
+        <span class="tab-icon" data-icon="play"></span><span class="tab-label">YouTube</span>
+      </button>
+      <button type="button" class="tab" data-tab="browser">
+        <span class="tab-icon" data-icon="globe"></span><span class="tab-label">Browser</span>
+      </button>
+      <button type="button" class="tab" data-tab="lists">
+        <span class="tab-icon" data-icon="list"></span><span class="tab-label">Listen</span>
+      </button>
+    </nav>
+
+    <main id="main" class="content" tabindex="-1">
+      <!-- Sender -->
+      <section class="view" id="view-sender" aria-labelledby="h-sender">
+        <header class="view-header">
+          <h1 id="h-sender">Sender</h1>
+          <div class="header-actions">
+            <button type="button" class="icon-btn" data-action="settings" aria-label="Einstellungen"><span data-icon="gear"></span></button>
+            <button type="button" class="btn btn-primary" data-action="add-link"><span data-icon="plus"></span>Link hinzufügen</button>
+          </div>
+        </header>
+        <div class="search-row">
+          <label class="search" for="sender-search">
+            <span data-icon="search" aria-hidden="true"></span>
+            <input id="sender-search" type="search" placeholder="Sender suchen" autocomplete="off" enterkeyhint="search">
+          </label>
+        </div>
+        <div class="chips" id="sender-chips" role="toolbar" aria-label="Filter"></div>
+        <div id="suggestions"></div>
+        <ul class="rows" id="sender-list" aria-label="Senderliste"></ul>
+        <div class="empty" id="sender-empty" hidden>
+          <span class="empty-icon" data-icon="tv" aria-hidden="true"></span>
+          <h2>Noch keine Sender</h2>
+          <p>Füge einen Link hinzu (z. B. die Livestream-Seite eines Senders) oder lade unter „Listen“ eine Senderliste.</p>
+        </div>
+        <button type="button" class="btn btn-secondary more-btn" id="sender-more" hidden>Mehr anzeigen</button>
+      </section>
+
+      <!-- Favoriten -->
+      <section class="view" id="view-favorites" aria-labelledby="h-favorites" hidden>
+        <header class="view-header">
+          <h1 id="h-favorites">Favoriten</h1>
+          <div class="header-actions">
+            <button type="button" class="icon-btn" data-action="settings" aria-label="Einstellungen"><span data-icon="gear"></span></button>
+          </div>
+        </header>
+        <ul class="rows" id="favorites-list" aria-label="Favoriten"></ul>
+        <div class="empty" id="favorites-empty" hidden>
+          <span class="empty-icon" data-icon="heart" aria-hidden="true"></span>
+          <h2>Noch keine Favoriten</h2>
+          <p>Tippe bei einem Sender auf das Herz – dann erscheint er hier.</p>
+        </div>
+      </section>
+
+      <!-- YouTube -->
+      <section class="view" id="view-youtube" aria-labelledby="h-youtube" hidden>
+        <header class="view-header">
+          <h1 id="h-youtube">YouTube</h1>
+          <div class="header-actions">
+            <button type="button" class="icon-btn" data-action="settings" aria-label="Einstellungen"><span data-icon="gear"></span></button>
+          </div>
+        </header>
+        <div class="card">
+          <div class="region-row">
+            <label class="field">
+              <span class="field-label">Land</span>
+              <select id="yt-country"></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Sprache</span>
+              <select id="yt-language"></select>
+            </label>
+          </div>
+          <button type="button" class="btn btn-primary btn-wide" id="yt-open-home"><span data-icon="play"></span>YouTube öffnen</button>
+        </div>
+        <form class="card" id="yt-search-form" novalidate>
+          <label class="field" for="yt-search">
+            <span class="field-label">Auf YouTube suchen</span>
+            <span class="input-row">
+              <input id="yt-search" type="search" placeholder="z. B. TRT Haber canlı" autocomplete="off" enterkeyhint="search">
+              <button type="submit" class="btn btn-secondary">Suchen</button>
+            </span>
+          </label>
+        </form>
+        <form class="card" id="yt-play-form" novalidate>
+          <label class="field" for="yt-link">
+            <span class="field-label">Video-Link hier abspielen</span>
+            <span class="input-row">
+              <input id="yt-link" type="url" placeholder="https://youtu.be/…" autocomplete="off" inputmode="url" enterkeyhint="go">
+              <button type="submit" class="btn btn-secondary">Abspielen</button>
+            </span>
+          </label>
+          <p class="hint" id="yt-link-hint">Ein YouTube-Video-Link wird direkt hier in der App abgespielt.</p>
+        </form>
+      </section>
+
+      <!-- Browser -->
+      <section class="view" id="view-browser" aria-labelledby="h-browser" hidden>
+        <header class="view-header">
+          <h1 id="h-browser">Browser</h1>
+          <div class="header-actions">
+            <button type="button" class="icon-btn" data-action="settings" aria-label="Einstellungen"><span data-icon="gear"></span></button>
+          </div>
+        </header>
+        <form class="card" id="browser-form" novalidate>
+          <label class="field" for="browser-address">
+            <span class="field-label">Adresse oder Suchbegriff</span>
+            <span class="input-row">
+              <input id="browser-address" type="text" placeholder="z. B. trt.net.tr" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="url" enterkeyhint="go">
+            </span>
+          </label>
+          <div class="button-row">
+            <button type="submit" class="btn btn-primary"><span data-icon="arrow"></span>Öffnen</button>
+            <button type="button" class="btn btn-secondary" id="browser-save"><span data-icon="bookmark"></span>Als Link speichern</button>
+          </div>
+          <p class="hint">Webseiten öffnen sich im Browser. Mit dem Zurück-Pfeil des Browsers kommst du wieder hierher.</p>
+        </form>
+        <h2 class="section-title" id="recent-title" hidden>Zuletzt geöffnet</h2>
+        <ul class="rows" id="recent-list" aria-labelledby="recent-title"></ul>
+      </section>
+
+      <!-- Listen -->
+      <section class="view" id="view-lists" aria-labelledby="h-lists" hidden>
+        <header class="view-header">
+          <h1 id="h-lists">Senderlisten</h1>
+          <div class="header-actions">
+            <button type="button" class="icon-btn" data-action="settings" aria-label="Einstellungen"><span data-icon="gear"></span></button>
+            <button type="button" class="btn btn-primary" data-action="add-list"><span data-icon="plus"></span>Liste hinzufügen</button>
+          </div>
+        </header>
+        <ul class="rows" id="lists-list" aria-label="Geladene Senderlisten"></ul>
+        <div class="empty" id="lists-empty" hidden>
+          <span class="empty-icon" data-icon="list" aria-hidden="true"></span>
+          <h2>Noch keine Senderliste</h2>
+          <p>Lade eine ganze Senderliste (M3U) – per Link, als Text oder als Datei. Danach erscheinen alle Sender unter „Sender“.</p>
+        </div>
+        <p class="legal-note">Nutze nur legale Listen, z. B. von Sendern selbst oder frei angebotene Streams. Gekaufte „Alle Sender für wenig Geld“-Listen sind in Deutschland meist illegal (§ 106 UrhG).</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Player -->
+  <section class="player" id="player" hidden aria-labelledby="player-title" role="dialog" aria-modal="true">
+    <header class="player-header">
+      <button type="button" class="icon-btn" id="player-close" aria-label="Zurück"><span data-icon="back"></span></button>
+      <h2 id="player-title">Player</h2>
+      <div class="header-actions">
+        <button type="button" class="icon-btn" id="player-fav" aria-label="Zu Favoriten"><span data-icon="heart"></span></button>
+        <a class="icon-btn" id="player-external" href="#" rel="noopener noreferrer" aria-label="Direkt im Browser öffnen"><span data-icon="external"></span></a>
+      </div>
+    </header>
+    <div class="player-stage" id="player-stage"></div>
+    <p class="player-status" id="player-status" role="status"></p>
+  </section>
+
+  <!-- Link-Formular -->
+  <dialog class="sheet" id="link-dialog" aria-labelledby="link-dialog-title">
+    <form method="dialog" id="link-form" novalidate>
+      <h2 id="link-dialog-title">Neuer Link</h2>
+      <label class="field" for="link-name">
+        <span class="field-label">Name</span>
+        <input id="link-name" type="text" placeholder="z. B. TRT 1" autocomplete="off" maxlength="120">
+      </label>
+      <label class="field" for="link-url">
+        <span class="field-label">Adresse</span>
+        <input id="link-url" type="text" placeholder="https://…" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="url" maxlength="2000">
+      </label>
+      <p class="hint" id="link-url-hint">Webseite, YouTube-Link oder direkter Stream-Link (.m3u8). Fehlt „https://“, wird es ergänzt.</p>
+      <label class="field" for="link-kind">
+        <span class="field-label">Öffnen als</span>
+        <select id="link-kind">
+          <option value="auto">Automatisch</option>
+          <option value="web">Webseite</option>
+          <option value="stream">Videostream</option>
+        </select>
+      </label>
+      <div class="button-row end">
+        <button type="button" class="btn btn-secondary" data-close>Abbrechen</button>
+        <button type="submit" class="btn btn-primary" id="link-save">Speichern</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Listen-Formular -->
+  <dialog class="sheet" id="list-dialog" aria-labelledby="list-dialog-title">
+    <form method="dialog" id="list-form" novalidate>
+      <h2 id="list-dialog-title">Senderliste hinzufügen</h2>
+      <label class="field" for="list-name">
+        <span class="field-label">Name</span>
+        <input id="list-name" type="text" placeholder="z. B. Türkische Sender" autocomplete="off" maxlength="120">
+      </label>
+      <div class="segmented" role="radiogroup" aria-label="Quelle">
+        <label><input type="radio" name="list-source" value="link" checked> Per Link</label>
+        <label><input type="radio" name="list-source" value="text"> Als Text</label>
+        <label><input type="radio" name="list-source" value="file"> Aus Datei</label>
+      </div>
+      <label class="field" for="list-url" data-source="link">
+        <span class="field-label">Link zur Liste (.m3u)</span>
+        <input id="list-url" type="text" placeholder="https://…/liste.m3u" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="url">
+      </label>
+      <label class="field" for="list-text" data-source="text" hidden>
+        <span class="field-label">Inhalt der Liste</span>
+        <textarea id="list-text" rows="6" placeholder="#EXTM3U&#10;#EXTINF:-1,Sendername&#10;https://…/stream.m3u8"></textarea>
+      </label>
+      <label class="field" for="list-file" data-source="file" hidden>
+        <span class="field-label">Datei auswählen</span>
+        <input id="list-file" type="file" accept=".m3u,.m3u8,.txt,audio/x-mpegurl,application/x-mpegurl,text/plain">
+      </label>
+      <p class="hint error" id="list-error" role="alert" hidden></p>
+      <p class="hint">Die Liste bleibt nur in diesem Browser gespeichert.</p>
+      <div class="button-row end">
+        <button type="button" class="btn btn-secondary" data-close>Abbrechen</button>
+        <button type="submit" class="btn btn-primary" id="list-save">Laden</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Einstellungen -->
+  <dialog class="sheet" id="settings-dialog" aria-labelledby="settings-title">
+    <form method="dialog" id="settings-form" novalidate>
+      <h2 id="settings-title">Einstellungen</h2>
+      <fieldset class="field">
+        <legend class="field-label">Darstellung</legend>
+        <div class="segmented" role="radiogroup" aria-label="Darstellung">
+          <label><input type="radio" name="theme" value="dark"> Dunkel</label>
+          <label><input type="radio" name="theme" value="light"> Hell</label>
+          <label><input type="radio" name="theme" value="auto"> Automatisch</label>
+        </div>
+      </fieldset>
+      <fieldset class="field">
+        <legend class="field-label">Sicherung</legend>
+        <div class="button-row">
+          <button type="button" class="btn btn-secondary" id="export-data"><span data-icon="download"></span>Daten sichern</button>
+          <label class="btn btn-secondary file-btn"><span data-icon="upload"></span>Sicherung laden<input type="file" id="import-data" accept=".json,application/json"></label>
+        </div>
+        <p class="hint">Sichert deine Links, Favoriten und Listen als Datei – z. B. um sie in einen anderen Browser zu übernehmen.</p>
+      </fieldset>
+      <fieldset class="field">
+        <legend class="field-label">Datenschutz</legend>
+        <p class="hint">Alles bleibt nur in diesem Browser gespeichert. Es gibt kein Konto und keinen Server. Erst wenn du ein YouTube-Video abspielst, wird YouTube (Google) geladen.</p>
+        <button type="button" class="btn btn-danger" id="reset-data"><span data-icon="trash"></span>Alle Daten löschen</button>
+      </fieldset>
+      <div class="button-row end">
+        <button type="submit" class="btn btn-primary">Fertig</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
